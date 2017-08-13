@@ -21,9 +21,9 @@ from core.REST_permissions import (IsGroupMember,
                                    IsGroupAdminOrAddMethod,
                                    group_admin)
 
-from .tasks import TestRule
+from .tasks import test_rule
 from .REST_filters import YaraRuleFilter
-from .models import YaraRule, YaraRuleComment
+from .models import YaraRule, YaraRuleComment, YaraTestFolder
 from .services import build_yarafile, parse_rule_submission
 
 from .REST_serializers import (YaraRuleSerializer,
@@ -126,9 +126,29 @@ class RulesetSearchView(ListAPIView):
 
 class RulesetTestingView(APIView):
     """
-    Test a set of rules against specified file directories
+    get:
+    Retrieve a listing of folders that are available to test rules against.
+
+    post:
+    Test a set of rules against specified file directories.
     """
+
     permission_classes = [IsGroupAdminOrReadOnly]
+
+    def get(self, request, group_name):
+        response_content = {}
+        group_context = get_group_or_404(group_name)
+
+        if group_context.groupmeta.rule_tests_allowed:
+            response_status = status.HTTP_200_OK
+            response_content['folders'] = [{'name': folder.name,
+                                            'description': folder.description}
+                                            for folder in YaraTestFolder.objects.all()]
+        else:
+            response_status = status.HTTP_401_UNAUTHORIZED
+            response_content['errors'] = ['Group not authorized for rule tests']
+
+        return Response(response_content, status=response_status)
 
     def post(self, request, group_name):
         response_content = {}
@@ -139,10 +159,10 @@ class RulesetTestingView(APIView):
             folders = request.data.getlist('folder')
 
             for folder_name in folders:
-                new_task = TestRule.delay(group_name,
-                                          request.query_params,
-                                          folder_name,
-                                          submitter.email)
+                new_task = test_rule.delay(group_name,
+                                           request.query_params,
+                                           folder_name,
+                                           submitter.email)
 
             response_status = status.HTTP_202_ACCEPTED
             response_content['folders'] = folders

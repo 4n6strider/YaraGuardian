@@ -9,7 +9,9 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.contrib.auth.models import Group
 from django.conf import settings
+
 from celery import Task
+from YaraGuardian.celery import app
 
 from .services import build_yarafile
 from .REST_filters import YaraRuleFilter
@@ -96,3 +98,8 @@ class TestRule(Task):
             message.attach_alternative(html_template.render(template_context), 'text/html')
 
             message.send()
+
+
+@app.task(bind=True)
+def test_rule(self, *args, **kwargs):
+    TestRule(*args, **kwargs).run()

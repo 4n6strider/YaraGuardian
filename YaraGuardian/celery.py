@@ -22,18 +22,20 @@ DATABASE_BACKEND = 'db+postgresql://{}:{}@{}:{}/{}'.format(settings.DB_USER,
 # Configure Broker Backend
 if settings.RMQ_PASS:
     BROKER_BACKEND = 'amqp://{}:{}@{}:{}/{}'.format(settings.RMQ_USER,
-                                                   settings.RMQ_PASS,
-                                                   settings.RMQ_HOST,
-                                                   settings.RMQ_PORT,
-                                                   settings.RMQ_VHOST)
+                                                    settings.RMQ_PASS,
+                                                    settings.RMQ_HOST,
+                                                    settings.RMQ_PORT,
+                                                    settings.RMQ_VHOST)
 else:
     BROKER_BACKEND = 'amqp://{}@{}:{}/{}'.format(settings.RMQ_USER,
                                                  settings.RMQ_HOST,
                                                  settings.RMQ_PORT,
                                                  settings.RMQ_VHOST)
 
+
 # Autodiscover tasks from installed Django applications
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
 
 # Update Celery instance with configurations
 app.conf.update(
