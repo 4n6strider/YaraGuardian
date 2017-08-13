@@ -86,6 +86,13 @@ DB_PASS = retrieve_setting('DATABASE_PASS')
 DB_HOST = retrieve_setting('DATABASE_HOST', defaultset=True, defaultval='127.0.0.1')
 DB_PORT = retrieve_setting('DATABASE_PORT', defaultset=True, defaultval='5432')
 
+# RabbitMQ Settings
+RMQ_USER = retrieve_setting('RABBITMQ_USER', defaultset=True, defaultval='guest')
+RMQ_PASS = retrieve_setting('RABBITMQ_PASS', defaultset=True, defaultval=None)
+RMQ_HOST = retrieve_setting('RABBITMQ_HOST', defaultset=True, defaultval='127.0.0.1')
+RMQ_PORT = retrieve_setting('RABBITMQ_PORT', defaultset=True, defaultval='5672')
+RMQ_VHOST = retrieve_setting('RABBITMQ_VHOST', defaultset=True, defaultval='/')
+
 WSGI_APPLICATION = 'YaraGuardian.wsgi.application'
 ROOT_URLCONF = 'YaraGuardian.urls'
 AUTH_USER_MODEL = 'core.User'

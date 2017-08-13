@@ -16,7 +16,7 @@ app.factory('apiService', function($location, $http, $q, djangoUrl) {
     };
 
     var apiCallError = function (deferred) {
-      return function (response) {deferred.reject(response.data.detail)}
+      return function (response) {deferred.reject(response)}
     };
 
     apiMethods.getURL = function(URL) {

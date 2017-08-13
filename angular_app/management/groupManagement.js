@@ -85,7 +85,7 @@ app.factory('groupService', function(apiService, accountService, messageService)
     };
 
     function groupChangeFailure(response) {
-        messageService.pushMessage(response, 'danger');
+        messageService.processMessages(response.data);
     };
 
     return groupMethods;
@@ -105,7 +105,7 @@ app.controller('GroupManagementController', function(groupService) {
     self.toggleCategory = function(value) {
         groupService.setCategoryRequirement(value);
     };
-    
+
     self.createNewGroup = function() {
         groupService.createGroup(self.formData.groupSubmission);
         clearObject(self.formData);

@@ -11,6 +11,13 @@ PSQL_DATABASE=yara_guardian
 PSQL_HOST=127.0.0.1
 PSQL_PORT=5432
 
+# RabbitMQ Settings
+RMQ_USERNAME=yara_guardian
+RMQ_PASSWORD=yara_guardian_password
+RMQ_HOST=127.0.0.1
+RMQ_PORT=5672
+RMQ_VHOST=yara
+
 if [ "$1" = "vagrant" ]; then
     INSTALL_DIR="/vagrant"
     HOME_PROFILE="/home/ubuntu/.profile"
@@ -24,6 +31,12 @@ if [ "$1" = "vagrant" ]; then
     echo "export DATABASE_PASS=${PSQL_PASSWORD}" >> ${HOME_PROFILE}
     echo "export DATABASE_HOST=${PSQL_HOST}" >> ${HOME_PROFILE}
     echo "export DATABASE_PORT=${PSQL_PORT}" >> ${HOME_PROFILE}
+
+    echo "export RABBITMQ_PASS=${RMQ_PASSWORD}" >> ${HOME_PROFILE}
+    echo "export RABBITMQ_USER=${RMQ_USERNAME}" >> ${HOME_PROFILE}
+    echo "export RABBITMQ_HOST=${RMQ_HOST}" >> ${HOME_PROFILE}
+    echo "export RABBITMQ_PORT=${RMQ_PORT}" >> ${HOME_PROFILE}
+    echo "export RABBITMQ_VHOST=${RMQ_VHOST}" >> ${HOME_PROFILE}
 
     echo "export GUEST_REGISTRATION=INVITE" >> ${HOME_PROFILE}
 else
@@ -44,11 +57,14 @@ apt-get install -y python3-all-dev libpq-dev python3-pip
 #####################################
 ### Add PostgreSQL Apt Repository ###
 #####################################
-echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > \
-  /etc/apt/sources.list.d/pgdg.list
+echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 
-wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
-  sudo apt-key add -
+###################################
+### Add RabbitMQ Apt Repository ###
+###################################
+echo "deb http://www.rabbitmq.com/debian/ testing main" | sudo tee /etc/apt/sources.list.d/rabbitmq.list
+wget --quiet -O - https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
 
 sudo apt-get update
 
@@ -65,6 +81,17 @@ echo "Configuring Postgresql Database"
 sudo -u postgres psql -d template1 -c "CREATE EXTENSION hstore"
 sudo -u postgres psql -c "CREATE DATABASE ${PSQL_DATABASE}"
 sudo -u postgres psql -c "CREATE USER ${PSQL_USERNAME} WITH PASSWORD '${PSQL_PASSWORD}' CREATEDB"
+
+######################################
+### Install and configure RabbitMQ ###
+######################################
+echo "Installing RabbitMQ"
+apt-get install -y rabbitmq-server
+
+rabbitmqctl delete_user guest
+rabbitmqctl add_vhost ${RMQ_VHOST}
+rabbitmqctl add_user ${RMQ_USERNAME} ${RMQ_PASSWORD}
+rabbitmqctl set_permissions -p ${RMQ_VHOST} ${RMQ_USERNAME} ".*" ".*" ".*"
 
 #####################################################
 ### Install and configure Py3 virtual environment ###

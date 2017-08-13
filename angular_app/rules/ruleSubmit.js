@@ -9,8 +9,6 @@ var app = angular.module('yaraGuardian.RuleSubmit', [
 app.controller('RuleSubmitController', function(accountService, apiService, messageService, ruleStatService) {
     var self = this;
 
-    self.submission = {};
-
     self.fileObjects = [];
     self.setMetadata = {};
 
@@ -43,22 +41,20 @@ app.controller('RuleSubmitController', function(accountService, apiService, mess
     };
 
     function submitSuccess(response) {
-        self.submission = response.data;
         initializeController();
 
-        var uploadMsg = self.submission.rule_upload_count + ' rules submitted';
-        var collisionMsg = self.submission.rule_collision_count + ' rule collisions occurred';
+        var uploadMsg = response.data.rule_upload_count + ' rules submitted';
+        var collisionMsg = response.data.rule_collision_count + ' rule collisions occurred';
 
         ruleStatService.retrieveStats(accountService.groupContext.name);
         messageService.pushMessage(uploadMsg, 'success');
         messageService.pushMessage(collisionMsg, 'warning');
-        messageService.processErrors(self.submission.errors);
-        messageService.processWarnings(self.submission.warnings);
+        messageService.processMessages(response.data);
     };
 
     function submitFailure(response) {
-        self.submission.errors = response.data;
         initializeController();
+        messageService.processMessages(response.data);
     };
 
     function initializeController() {

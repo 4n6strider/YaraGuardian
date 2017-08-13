@@ -1,0 +1,31 @@
+{% load static %}
+
+Scan Summary
+------------
+Folder Name: {{ folder_name }}
+Number of Files Scanned: {{ file_count }}
+Number of Rules in Set: {{ rule_count }}
+Number of Rule Matches: {{ matches | length }}
+Folder Description: {{ folder_description }}
+
+External variables
+------------------
+{% if externals %}
+  {% for key, value in externals.items %}
+    {{ key }}: {{ value }}
+  {% endfor %}
+{% else %}
+  No external variables specified
+{% endif %}
+
+{% if matches %}
+  {% for rulename, filenames in matches.items %}
+    Matches for {{ rulename }}
+    --------------------------
+    {% for filename in filenames %}
+      {{ filename }}
+    {% endfor %}
+  {% endfor %}
+{% else %}
+  There were no rule matches
+{% endif %}

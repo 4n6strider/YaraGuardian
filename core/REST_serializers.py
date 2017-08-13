@@ -41,6 +41,7 @@ class PrivateGroupSerializer(serializers.Serializer):
     category_options = serializers.SerializerMethodField()
 
     rule_count = serializers.SerializerMethodField()
+    rule_tests_allowed = serializers.BooleanField(read_only=True)
 
     def get_owner(self, obj):
         return obj.groupmeta.owner.username

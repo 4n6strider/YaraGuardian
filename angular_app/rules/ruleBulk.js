@@ -97,8 +97,7 @@ app.controller('RuleBulkController', function($httpParamSerializer, apiService, 
     function ruleUpdateSuccess(response) {
         var updateMsg = "Update operation performed on " + response.data['modified_rule_count'] + " rules"
         messageService.pushMessage(updateMsg, 'success');
-        messageService.processErrors(response.data['errors']);
-        messageService.processWarnings(response.data['warnings']);
+        messageService.processMessages(response.data);
 
         ruleSearchService.refreshSearch(accountService.groupContext.name);
         ruleStatService.retrieveStats(accountService.groupContext.name);
@@ -113,8 +112,7 @@ app.controller('RuleBulkController', function($httpParamSerializer, apiService, 
     };
 
     function ruleMethodSuccess(response) {
-      messageService.processChanges(response.data['changes']);
-      messageService.processWarnings(response.data['warnings']);
+      messageService.processMessages(response.data);
       ruleStatService.retrieveStats(accountService.groupContext.name);
     };
 

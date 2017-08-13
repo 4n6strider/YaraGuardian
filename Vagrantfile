@@ -9,6 +9,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Django development server port forwarding
     config.vm.network "forwarded_port", guest: 8000, host: 8000
 
+    # RabbitMQ server port forwarding
+    config.vm.network "forwarded_port", guest: 5672, host: 5672
+    
         config.vm.provider "virtualbox" do |v|
             v.memory = 1024
             v.cpus = 2

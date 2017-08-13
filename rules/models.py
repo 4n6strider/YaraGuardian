@@ -5,11 +5,9 @@ from django.contrib.postgres.fields import ArrayField, HStoreField, JSONField
 from django.contrib.auth.models import Group
 from core.models import TimeStampedModel
 
-from .managers import YaraRuleManager
+from .managers import YaraRuleManager, YaraRuleCommentManager
 
-from plyara import ParserInterpreter
-
-interp = ParserInterpreter()
+from plyara import YaraParser
 
 
 class YaraRule(TimeStampedModel):
@@ -76,7 +74,7 @@ class YaraRule(TimeStampedModel):
         raw_rule['condition_terms'] = self.condition
         raw_rule['scopes'] = self.scopes
 
-        formatted_rule = interp.rebuildYaraRule(raw_rule)
+        formatted_rule = YaraParser.parserInterpreter.rebuildYaraRule(raw_rule)
         return formatted_rule
 
     def __str__(self):
@@ -87,3 +85,12 @@ class YaraRuleComment(TimeStampedModel):
     content = models.TextField()
     poster = models.ForeignKey(settings.AUTH_USER_MODEL)
     rule = models.ForeignKey(YaraRule, on_delete=models.CASCADE)
+
+    # Instantiate custom manager
+    objects = YaraRuleCommentManager()
+
+
+class YaraTestFolder(models.Model):
+    name = models.CharField(unique=True, blank=False, max_length=75)
+    path = models.CharField(unique=True, blank=False, max_length=4096)
+    description = models.TextField()

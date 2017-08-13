@@ -39,6 +39,8 @@ class GroupMeta(models.Model):
     category_required = models.BooleanField(default=True)
     category_options = ArrayField(models.CharField(max_length=75), default=list)
 
+    rule_tests_allowed = models.BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         self.source_options = list(set(self.source_options))
         self.category_options = list(set(self.category_options))

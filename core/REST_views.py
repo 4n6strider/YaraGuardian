@@ -56,17 +56,17 @@ class AccountGroupsView(APIView):
 
         # Ensure group name was specified
         if not group_name:
-            return Response('No Group Name Specified',
+            return Response({'errors': ['No Group Name Specified']},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Verify group does not already exist
         elif Group.objects.filter(name=group_name).exists():
-            return Response('Group Already Exists',
+            return Response({'errors': ['Group Already Exists']},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Verify a user with the same name does not already exist
         elif User.objects.filter(username=group_name).exists():
-            return Response('Group Already Exists',
+            return Response({'errors': ['Group Already Exists']},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Create group and group meta

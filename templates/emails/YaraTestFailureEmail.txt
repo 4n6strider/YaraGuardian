@@ -1,0 +1,7 @@
+{% load static %}
+
+Attempted Scan Failed
+---------------------
+Group context: {{ group }}
+Target folder: {{ folder }}
+Reason for failure: {{ reason }}
